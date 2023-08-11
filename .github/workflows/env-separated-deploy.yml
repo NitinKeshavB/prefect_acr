@@ -78,7 +78,7 @@ jobs:
       - name: deploy flows
         run: |
           echo "Deploying flows"
-          prefect --no-prompt deploy -n arthur flows/hello.py:hello
+          prefect --no-prompt deploy -n default flows/hello.py:hello
           
           echo "deploying without prompts...."   
                
