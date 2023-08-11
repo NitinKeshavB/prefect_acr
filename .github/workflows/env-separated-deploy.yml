@@ -1,0 +1,67 @@
+# Deploys changed flows to the appropriate Prefect Cloud workspace
+
+name: Deploy flows to env
+
+env:
+  PREFECT_API_KEY: "pnu_PxirMNgAXP5xsEIXNqEziqQpJikcJ81CyfHe"
+  PREFECT_API_URL: "https://app.prefect.cloud/account/60a02238-cfc1-4e3d-9784-53f5ea65191b/workspace/20d43868-3e22-440c-9bb2-dc9e1b51126f"
+  DEV_WORKSPACE: "nitinkeshavboutlookcom/dev"
+
+on:
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      name:
+        # Friendly description to be shown in the UI instead of 'name'
+        description: Executing workflow'
+        # Default value if no value is explicitly provided
+        default: 'Prefect'
+        # Input has to be provided for the workflow to run
+        required: true
+        # The data type of the input
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  deploy_flows:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+  
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          pip install .
+
+      - name: Get list of modified python files
+        id: getfile
+        run: |
+          files=$(git diff --name-only | grep '^src/.*\.py$' | tr '\n' ',')
+          echo "Modified Python files: $files"
+          echo "files=$files" >> $GITHUB_ENV
+
+      - name: switch to dev
+        run: |          
+          prefect cloud workspace set --workspace "nitinkeshavboutlookcom/dev"
+        if: github.ref == 'refs/heads/main'
+
+      - name: Deploy flows in branch defined in modified files
+        run: |
+          echo "logging in ACR"
+          az acr login -n jllsbxprefect.azurecr.io -u jllsbxprefect -p NCBY3GvxjE8x8lZW+ox9wvCdXo4JIBpekcqnwq6LEl+ACRBONePf
+          echo "deploying.."
+          prefect deploy --all --ci 
+                
+        env:
+          files: ${{ env.files }}

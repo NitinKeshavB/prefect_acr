@@ -32,5 +32,5 @@ pull:
 #     access_token: t2vvy2mqkftg5ijn43sr37whjddsupdpucezhbukqtaqp7gungka
 
 - prefect.projects.steps.set_working_directory:
-    directory: /opt/prefect/prefect_kubeworker
+    directory: /opt/prefect/prefect_acr
 
