@@ -17,7 +17,7 @@ build:
     requires: prefect-docker
     image_name: "jllsbxprefect/prefect_monorepo_kube"
     tag: "{{ get-commit-hash.stdout }}"
-    dockerfile: Dockerfile.Demo
+    dockerfile: auto
     push: true
     platform: "linux/amd64"
 
@@ -43,7 +43,7 @@ definitions:
   work_pool: &common_work_pool
     name: "kubernetes"
     job_variables:
-      image: "jllsbxprefect/prefect_monorepo_kube"
+      image: "jllsbxprefect/prefect_monorepo_kube:latest"
 
 
 deployments:
