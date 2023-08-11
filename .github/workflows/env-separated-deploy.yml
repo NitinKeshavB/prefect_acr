@@ -62,7 +62,11 @@ jobs:
           az acr login -n jllsbxprefect.azurecr.io -u jllsbxprefect -p NCBY3GvxjE8x8lZW+ox9wvCdXo4JIBpekcqnwq6LEl+ACRBONePf
           echo "deploying.."
           ls -ltr 
-          echo "deployed.."
+
+          echo "deploying without prompts...."
+          prefect --no-prompt deploy --all
+
+          echo "deploying without prompts...."
                 
         env:
           files: ${{ env.files }}

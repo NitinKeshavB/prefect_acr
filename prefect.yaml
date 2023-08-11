@@ -15,11 +15,11 @@ build:
     stream_output: false
 - prefect_docker.projects.steps.build_docker_image:
     requires: prefect-docker
-    image_name: "{{ prefect.variables.image_name }}"
+    image_name: "jllsbxprefect/prefect_monorepo_kube"
     tag: "{{ get-commit-hash.stdout }}"
     dockerfile: auto
     push: true
-    platform: "linux/amd64"
+    platform: "ubuntu-latest"
 
 # push section allows you to manage if and how this project is uploaded to remote locations
 push: null
@@ -34,3 +34,40 @@ pull:
 - prefect.projects.steps.set_working_directory:
     directory: /opt/prefect/prefect_acr
 
+
+definitions:
+  tags: &common_tags
+    - "remote"
+    - "eks"
+    - "{{ get-commit-hash.stdout }}"
+  work_pool: &common_work_pool
+    name: "kubernetes"
+    job_variables:
+      image: "jllsbxprefect/prefect_monorepo_kube"
+
+
+deployments:
+- name: "default"
+  tags: *common_tags
+  entrypoint: "flows/hello.py:hello"
+  work_pool: *common_work_pool
+
+- name: "arthur"
+  tags: *common_tags
+  entrypoint: "flows/hello.py:hello"
+  parameters:
+    name: "Arthur"
+  work_pool: *common_work_pool
+
+- name: "default"
+  tags: *common_tags
+  entrypoint: "flows/hello.py:hello_parallel"
+  work_pool: *common_work_pool
+
+- name: "databricks_execute"
+  tags: *common_tags
+  entrypoint: "flows/databricks_api_exec.py:databricks_job_submit"
+  parameters:
+    databricks_credentials_block_name: "qa-databricks-repo"
+    job_id: "157107892089699"
+  work_pool: *common_work_pool
