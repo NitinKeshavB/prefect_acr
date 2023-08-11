@@ -81,7 +81,7 @@ jobs:
       - name: Run Prefect Deploy
         uses: PrefectHQ/actions-prefect-deploy@v3
         with:
-          deployment-names: default
+          deployment-names: arthur
           requirements-file-paths: ./requirements.txt
                
         env:
