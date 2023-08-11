@@ -63,10 +63,10 @@ jobs:
           echo "deploying.."
           ls -ltr 
 
-          echo "deploying without prompts...."
-          prefect --no-prompt deploy --all
+          docker --version
 
           echo "deploying without prompts...."
-                
+
+               
         env:
           files: ${{ env.files }}
