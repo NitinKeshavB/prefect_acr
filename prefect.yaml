@@ -60,7 +60,6 @@ deployments:
   tags: *common_tags
   entrypoint: "flows/hello.py:hello"
   work_pool: *common_work_pool
-  build: *docker_build
 
 - name: "arthur"
   tags: *common_tags
