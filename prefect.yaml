@@ -1,0 +1,36 @@
+# File for configuring project / deployment build, push and pull steps
+
+# Generic metadata about this project
+name: kubernetes-worker-demo
+prefect-version: 2.10.12
+
+# build section allows you to manage and build docker images
+# TODO: Uses unreleased changes that requires installing from main:
+#     pip install git+https://github.com/PrefectHQ/prefect.git
+#     pip install git+https://github.com/PrefectHQ/prefect-docker.git
+build:
+- prefect.projects.steps.run_shell_script:
+    id: get-commit-hash
+    script: git rev-parse --short HEAD
+    stream_output: false
+- prefect_docker.projects.steps.build_docker_image:
+    requires: prefect-docker
+    image_name: "{{ prefect.variables.image_name }}"
+    tag: "{{ get-commit-hash.stdout }}"
+    dockerfile: auto
+    push: true
+    platform: "linux/amd64"
+
+# push section allows you to manage if and how this project is uploaded to remote locations
+push: null
+
+# pull section allows you to provide instructions for cloning this project in remote locations
+pull:
+# - prefect.projects.steps.git_clone_project:
+#     repository: https://dev.azure.com/nitinkeshavb/_git/prefect_kubeworker
+#     branch: master
+#     access_token: t2vvy2mqkftg5ijn43sr37whjddsupdpucezhbukqtaqp7gungka
+
+- prefect.projects.steps.set_working_directory:
+    directory: /opt/prefect/prefect_kubeworker
+

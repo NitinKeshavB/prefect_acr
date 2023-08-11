@@ -1,0 +1,6 @@
+worker:
+  cloudApiConfig:
+    accountId: "60a02238-cfc1-4e3d-9784-53f5ea65191b"
+    workspaceId: "20d43868-3e22-440c-9bb2-dc9e1b51126f"
+  config:
+    workPool: "kubernetes"
