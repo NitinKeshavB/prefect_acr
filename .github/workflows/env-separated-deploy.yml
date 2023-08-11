@@ -56,14 +56,22 @@ jobs:
           prefect cloud workspace set --workspace "nitinkeshavboutlookcom/dev"
         if: github.ref == 'refs/heads/main'
 
+      - name: Login to ACR
+        uses: docker/login-action@v1
+        with:
+          registry: jllsbxprefect.azurecr.io
+          username: jllsbxprefect
+          password: NCBY3GvxjE8x8lZW+ox9wvCdXo4JIBpekcqnwq6LEl+ACRBONePf
+
       - name: Deploy flows in branch defined in modified files
         run: |
-          echo "logging in ACR"
-          az acr login -n jllsbxprefect.azurecr.io -u jllsbxprefect -p NCBY3GvxjE8x8lZW+ox9wvCdXo4JIBpekcqnwq6LEl+ACRBONePf
-          echo "deploying.."
+          echo "Building image"
+          docker build -t jllsbxprefect/monorepo:latest -f Dockerfile.Demo .
+          docker tag jllsbxprefect/monorepo:latest jllsbxprefect.azurecr.io/jllsbxprefect/monorepo:latest
+          docker push jllsbxprefect.azurecr.io/jllsbxprefect/monorepo:latest
+          echo "image pushed.."
           ls -ltr 
 
-          docker --version
 
           echo "deploying without prompts...."
 
