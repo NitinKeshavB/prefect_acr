@@ -77,13 +77,12 @@ jobs:
 
           echo "deploying without prompts...."
 
-      - name: deploy flows
-        run: |
-          echo "Deploying flows"
-          prefect version
-          prefect deploy --all --ci
-          
-          echo "deploying without prompts...."   
+
+      - name: Run Prefect Deploy
+        uses: PrefectHQ/actions-prefect-deploy@v3
+        with:
+          deployment-names: default
+          requirements-file-paths: ./requirements.txt
                
         env:
           files: ${{ env.files }}
