@@ -79,7 +79,7 @@ jobs:
         run: |
           echo "Deploying flows"
           prefect version
-          prefect deploy -n arthur --interval 500
+          prefect deploy -n default
           echo "deploying without prompts...."   
                
         env:

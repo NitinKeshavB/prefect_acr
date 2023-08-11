@@ -44,6 +44,15 @@ definitions:
     name: "kubernetes"
     job_variables:
       image: "jllsbxprefect/prefect_monorepo_kube:latest"
+  actions:
+       docker_build: &docker_build
+            - prefect_docker.deployments.steps.build_docker_image: &docker_build_config
+                id: build-image
+                requires: prefect-docker>=0.3.0
+                image_name: "jllsbxprefect/prefect_monorepo_kube"
+                tag: latest
+                dockerfile: auto
+                push: true
 
 
 deployments:
@@ -51,6 +60,7 @@ deployments:
   tags: *common_tags
   entrypoint: "flows/hello.py:hello"
   work_pool: *common_work_pool
+  build: *docker_build
 
 - name: "arthur"
   tags: *common_tags
