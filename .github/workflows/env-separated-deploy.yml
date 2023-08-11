@@ -51,10 +51,12 @@ jobs:
           echo "Modified Python files: $files"
           echo "files=$files" >> $GITHUB_ENV
 
-      - name: switch to dev
-        run: |          
-          prefect cloud workspace set --workspace "nitinkeshavboutlookcom/dev"
-        if: github.ref == 'refs/heads/main'
+      - name: Prefect Auth
+        uses: PrefectHQ/actions-prefect-auth@v1
+        with:
+          prefect-api-key: "pnu_PxirMNgAXP5xsEIXNqEziqQpJikcJ81CyfHe"
+          prefect-workspace: "nitinkeshavboutlookcom/dev"
+
 
       - name: Login to ACR
         uses: docker/login-action@v1
@@ -78,7 +80,8 @@ jobs:
       - name: deploy flows
         run: |
           echo "Deploying flows"
-          prefect --no-prompt deploy -n default flows/hello.py:hello
+          prefect version
+          prefect deploy --all --ci
           
           echo "deploying without prompts...."   
                
