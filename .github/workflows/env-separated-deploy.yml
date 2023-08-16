@@ -77,13 +77,11 @@ jobs:
 
           echo "deploying without prompts...."
 
-      - name: Execute prefect commands
-        run: |
-          prefect variable inspect image_name_mono
-
-      - name: Deploy fowa
-        run: |
-          prefect deploy --all --ci
+      - name: Run Prefect Deploy
+        uses: PrefectHQ/actions-prefect-deploy@v3
+        with:
+          deployment-names: databricks_exec
+          requirements-file-paths: ./requirements.txt
 
               
         env:
