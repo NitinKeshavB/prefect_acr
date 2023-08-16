@@ -15,7 +15,7 @@ build:
     stream_output: false
 - prefect_docker.projects.steps.build_docker_image:
     requires: prefect-docker
-    image_name: "jllsbxprefect/prefect_monorepo_kube"
+    image_name: "{{ prefect.variables.image_name_mono }}"
     tag: "{{ get-commit-hash.stdout }}"
     dockerfile: auto
     push: true
@@ -43,13 +43,13 @@ definitions:
   work_pool: &common_work_pool
     name: "kubernetes"
     job_variables:
-      image: "jllsbxprefect/prefect_monorepo_kube:latest"
+      image: "{{ image }}"
   actions:
        docker_build: &docker_build
             - prefect_docker.deployments.steps.build_docker_image: &docker_build_config
                 id: build-image
                 requires: prefect-docker>=0.3.0
-                image_name: "jllsbxprefect/prefect_monorepo_kube"
+                image_name: "{{ prefect.variables.image_name_mono }}"
                 tag: latest
                 dockerfile: auto
                 push: true
@@ -75,3 +75,4 @@ deployments:
     databricks_credentials_block_name: "qa-databricks-repo"
     job_id: "157107892089699"
   work_pool: *common_work_pool
+  
