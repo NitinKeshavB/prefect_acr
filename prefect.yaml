@@ -56,10 +56,6 @@ definitions:
 
 
 deployments:
-- name: "default"
-  tags: *common_tags
-  entrypoint: "flows/hello.py:hello"
-  work_pool: *common_work_pool
 
 - name: "arthur"
   tags: *common_tags
