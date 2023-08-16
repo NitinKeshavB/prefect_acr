@@ -79,7 +79,7 @@ jobs:
 
       - name: Execute prefect commands
         run: |
-          prefect variable ls
+          prefect variable inspect image_name_mono
 
       - name: Deploy fowa
         run: |
