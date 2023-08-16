@@ -80,7 +80,7 @@ jobs:
       - name: Run Prefect Deploy
         uses: PrefectHQ/actions-prefect-deploy@v3
         with:
-          deployment-names: databricks-job-submit/databricks_execute
+          deployment-names: databricks_execute
           requirements-file-paths: ./requirements.txt
 
               
