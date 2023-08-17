@@ -17,7 +17,7 @@ build:
     requires: prefect-docker
     image_name: "{{ prefect.variables.image_name_mono }}"
     tag: "{{ get-commit-hash.stdout }}"
-    dockerfile: Docketfile.Demo
+    dockerfile: Dockerfile.Demo
     push: true
     platform: "linux/amd64"
 

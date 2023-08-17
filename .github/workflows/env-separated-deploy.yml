@@ -65,21 +65,9 @@ jobs:
           username: jllsbxprefect
           password: NCBY3GvxjE8x8lZW+ox9wvCdXo4JIBpekcqnwq6LEl+ACRBONePf
 
-      - name: build and publish image
-        run: |
-          echo "Building image"
-          docker build -t jllsbxprefect/prefect_monorepo_kube:latest -f Dockerfile.Demo .
-          docker tag jllsbxprefect/prefect_monorepo_kube:latest jllsbxprefect.azurecr.io/jllsbxprefect/prefect_monorepo_kube:latest
-          docker push jllsbxprefect.azurecr.io/jllsbxprefect/prefect_monorepo_kube:latest
-          echo "image pushed.."
-          ls -ltr 
-
-
-          echo "deploying without prompts...."
-
-
       - name: deploy
         run: |
          pip install prefect -U "prefect>=2.11.3"
-         echo `ls -ltr`
+         ls -ltr
+         docker --version
          prefect --no-prompt deploy --all --ci
