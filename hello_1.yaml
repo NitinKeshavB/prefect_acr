@@ -1,7 +1,7 @@
 ###
 ### A complete description of a Prefect Deployment for flow 'databricks-job-submit'
 ###
-name: databricks_exe
+name: databricks_github
 description: null
 version: 00479ba25be10f7f9d4ba1b56bcbd3c0
 # The work queue that will handle this deployment's runs
@@ -44,7 +44,7 @@ infrastructure:
 flow_name: databricks-job-submit
 manifest_path: null
 storage: null
-path: /opt/prefect/flows
+path: /opt/prefect/prefect_acr/flows
 entrypoint: flows\databricks_api_exec.py:databricks_job_submit
 parameter_openapi_schema:
   title: Parameters
