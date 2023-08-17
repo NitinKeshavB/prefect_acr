@@ -35,7 +35,7 @@ deployments:
   version: null
   tags: []
   description: null
-  entrypoint: .\\flows\\databricks_api_exec.py:databricks_job_submit
+  entrypoint: ./flows/databricks_api_exec.py:databricks_job_submit
   parameters:
     databricks_credentials_block_name: "qa-databricks-repo"
     job_id: "157107892089699"

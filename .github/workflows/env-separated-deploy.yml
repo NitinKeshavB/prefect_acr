@@ -63,4 +63,4 @@ jobs:
          az acr login -n jllsbxprefect.azurecr.io -u jllsbxprefect -p NCBY3GvxjE8x8lZW+ox9wvCdXo4JIBpekcqnwq6LEl+ACRBONePf
          ls -ltr
          docker --version
-         prefect --no-prompt deploy --all --ci
+         prefect --no-prompt deploy -n databricks_exec
