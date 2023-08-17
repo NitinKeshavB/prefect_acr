@@ -5,7 +5,7 @@ name = "prefect-monorepo"
 dynamic = ["version"]
 description = "A demo monorepo for Prefect workflows."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 dependencies = [
     "prefect~=2.11.3",
     "marvin~=1.2.1",
@@ -17,23 +17,6 @@ dependencies = [
 
 [project.optional-dependencies]
 
-
-dev = [
-    "black[jupyter]",
-    "ipython",
-    "mkdocs-autolinks-plugin~=0.7",
-    "mkdocs-awesome-pages-plugin~=2.8",
-    "mkdocs-material~=9.1",
-    "mkdocstrings[python]~=0.20",
-    "pandas>=2.0",
-    "pdbpp~=0.10",
-    "pre-commit>=2.21,<4.0",
-    "pytest-asyncio~=0.20",
-    "pytest-env~=0.8",
-    "pytest-sugar~=0.9",
-    "pytest~=7.2",
-    "ruff",
-]
 
 [project.urls]
 Code = "https://github.com/zzstoatzz/prefect-monorepo"
