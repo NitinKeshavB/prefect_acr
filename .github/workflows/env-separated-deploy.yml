@@ -81,7 +81,7 @@ jobs:
       - name: deploy
         run: |
          pip install prefect -U "prefect>=2.11.3"
-         prefect deploy --name "databricks_execute"
+         prefect deploy --all --ci
 
 
               
