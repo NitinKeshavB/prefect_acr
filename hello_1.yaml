@@ -19,24 +19,16 @@ is_schedule_active: null
 infra_overrides:
   image: 'jllsbxprefect.azurecr.io/jllsbxprefect/prefect_monorepo'
 infrastructure:
-  type: docker-container
+  type: process
   env: {}
   labels: {}
   name: null
   command: null
-  image: prefecthq/prefect:2.11.3-python3.9
-  image_pull_policy: null
-  image_registry: null
-  networks: []
-  network_mode: null
-  auto_remove: false
-  volumes: []
   stream_output: true
-  memswap_limit: null
-  mem_limit: null
-  privileged: false
-  block_type_slug: docker-container
-  _block_type_slug: docker-container
+  working_dir: null
+  block_type_slug: process
+  _block_type_slug: process
+
 
 ###
 ### DO NOT EDIT BELOW THIS LINE

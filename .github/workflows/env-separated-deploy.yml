@@ -43,7 +43,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install --upgrade --upgrade-strategy eager -r requirements.txt
+          pip install --upgrade --upgrade-strategy eager -r requirement.txt
           
 
       - name: Get list of modified python files
@@ -64,4 +64,5 @@ jobs:
          az acr login -n jllsbxprefect.azurecr.io -u jllsbxprefect -p NCBY3GvxjE8x8lZW+ox9wvCdXo4JIBpekcqnwq6LEl+ACRBONePf
          ls -ltr
          docker --version
-         prefect --no-prompt deploy -n databricks_exec
+         prefect version
+         prefect deployment apply hello_1.yaml

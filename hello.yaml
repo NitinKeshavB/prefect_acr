@@ -7,9 +7,16 @@ version: 00479ba25be10f7f9d4ba1b56bcbd3c0
 # The work queue that will handle this deployment's runs
 work_queue_name: default
 work_pool_name: kubernetes
+job_variables:
+    image: 'jllsbxprefect.azurecr.io/jllsbxprefect/prefect_monorepo'
 tags: []
-parameters: {}
-schedule: null
+parameters:
+    databricks_credentials_block_name: "qa-databricks-repo"
+    job_id: "157107892089699"
+schedule:
+    interval: 600
+    anchor_date: '2023-08-17T03:51:53.048975+00:00'
+    timezone: UTC
 is_schedule_active: null
 infra_overrides: {}
 infrastructure:
