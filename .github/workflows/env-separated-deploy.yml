@@ -42,7 +42,9 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install .
+          python -m pip install --upgrade pip
+          pip install --upgrade --upgrade-strategy eager -r requirement.txt
+          
 
       - name: Get list of modified python files
         id: getfile
@@ -58,8 +60,7 @@ jobs:
           prefect-workspace: "nitinkeshavboutlookcom/dev"
 
       - name: deploy
-        run: |
-         pip install prefect -U "prefect>=2.11.3"
+        run: |        
          az acr login -n jllsbxprefect.azurecr.io -u jllsbxprefect -p NCBY3GvxjE8x8lZW+ox9wvCdXo4JIBpekcqnwq6LEl+ACRBONePf
          ls -ltr
          docker --version
