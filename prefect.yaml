@@ -7,27 +7,38 @@ name: prefect_acr
 prefect-version: 2.11.3
 
 # build section allows you to manage and build docker images
-build:
-- prefect_docker.deployments.steps.build_docker_image:
-    requires: prefect-docker>=0.3.1
-    id: build-image
-    dockerfile: auto
-    image_name: jllsbxprefect.azurecr.io/jllsbxprefect/prefect_monorepo
-    tag: latest
+build: null
 
 # push section allows you to manage if and how this project is uploaded to remote locations
-push:
-- prefect_docker.deployments.steps.push_docker_image:
-    requires: prefect-docker>=0.3.1
-    image_name: '{{ build-image.image_name }}'
-    tag: '{{ build-image.tag }}'
-    credentials: '{{ prefect_docker.docker-registry-credentials.docker_registry_creds_name
-      }}'
+push: null
 
 # pull section allows you to provide instructions for cloning this project in remote locations
 pull:
 - prefect.deployments.steps.set_working_directory:
     directory: /opt/prefect/prefect_acr
+
+
+definitions:
+
+  actions:
+        docker_build: &docker_build
+            - prefect.projects.steps.run_shell_script:
+                id: get-commit-hash
+                script: git rev-parse --short HEAD
+                stream_output: false
+            - prefect_docker.deployments.steps.build_docker_image: &docker_build_config
+                id: build-image-l
+                requires: prefect-docker>=0.3.1
+                image_name: jllsbxprefect.azurecr.io/jllsbxprefect/prefect_monorepo
+                tag: "{{ get-commit-hash.stdout }}"
+                dockerfile: auto
+                push: 
+                - prefect_docker.deployments.steps.push_docker_image:
+                    requires: prefect-docker>=0.3.1
+                    image_name: '{{ build-image-l.image_name }}'
+                    tag: '{{ build-image-l.tag }}'
+                    credentials: '{{ prefect_docker.docker-registry-credentials.docker_registry_creds_name }}'
+
 
 # the deployments section allows you to provide configuration for deploying flows
 deployments:
@@ -48,3 +59,6 @@ deployments:
     interval: 600
     anchor_date: '2023-08-17T03:51:53.048975+00:00'
     timezone: UTC
+  build: *docker_build
+
+
