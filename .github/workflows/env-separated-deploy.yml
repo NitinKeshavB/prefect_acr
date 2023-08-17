@@ -65,4 +65,4 @@ jobs:
          ls -ltr
          docker --version
          prefect version
-         prefect deployment apply hello_1.yaml
+         prefect deploy --all --ci
