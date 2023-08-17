@@ -17,7 +17,7 @@ build:
     requires: prefect-docker
     image_name: "{{ prefect.variables.image_name_mono }}"
     tag: "{{ get-commit-hash.stdout }}"
-    dockerfile: auto
+    dockerfile: Docketfile.Demo
     push: true
     platform: "linux/amd64"
 
@@ -44,15 +44,7 @@ definitions:
     name: "kubernetes"
     job_variables:
       image: "{{ image }}"
-  actions:
-       docker_build: &docker_build
-            - prefect_docker.deployments.steps.build_docker_image: &docker_build_config
-                id: build-image
-                requires: prefect-docker>=0.3.0
-                image_name: "{{ prefect.variables.image_name_mono }}"
-                tag: latest
-                dockerfile: auto
-                push: true
+
 
 
 deployments:

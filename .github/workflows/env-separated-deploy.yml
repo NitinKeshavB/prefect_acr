@@ -81,9 +81,5 @@ jobs:
       - name: deploy
         run: |
          pip install prefect -U "prefect>=2.11.3"
-         prefect deploy --all --ci
-
-
-              
-        env:
-          files: ${{ env.files }}
+         echo `ls -ltr`
+         prefect --no-prompt deploy --all --ci
