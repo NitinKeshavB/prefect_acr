@@ -43,7 +43,7 @@ definitions:
   work_pool: &common_work_pool
     name: "kubernetes"
     job_variables:
-      image: "{{ image }}"
+      image: "{{ image_name  }}"
 
 
 

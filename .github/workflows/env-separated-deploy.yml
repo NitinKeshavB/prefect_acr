@@ -57,17 +57,10 @@ jobs:
           prefect-api-key: "pnu_PxirMNgAXP5xsEIXNqEziqQpJikcJ81CyfHe"
           prefect-workspace: "nitinkeshavboutlookcom/dev"
 
-
-      - name: Login to ACR
-        uses: docker/login-action@v1
-        with:
-          registry: jllsbxprefect.azurecr.io
-          username: jllsbxprefect
-          password: NCBY3GvxjE8x8lZW+ox9wvCdXo4JIBpekcqnwq6LEl+ACRBONePf
-
       - name: deploy
         run: |
          pip install prefect -U "prefect>=2.11.3"
+         az acr login -n jllsbxprefect.azurecr.io -u jllsbxprefect -p NCBY3GvxjE8x8lZW+ox9wvCdXo4JIBpekcqnwq6LEl+ACRBONePf
          ls -ltr
          docker --version
          prefect --no-prompt deploy --all --ci
