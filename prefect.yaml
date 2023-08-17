@@ -35,7 +35,7 @@ deployments:
   version: null
   tags: []
   description: null
-  entrypoint: flows\databricks_api_exec.py:databricks_job_submit
+  entrypoint: flows/databricks_api_exec.py:databricks_job_submit
   parameters:
     databricks_credentials_block_name: "qa-databricks-repo"
     job_id: "157107892089699"
@@ -45,6 +45,6 @@ deployments:
     job_variables:
       image: '{{ build-image.image }}'
   schedule:
-    interval: 120
+    interval: 600
     anchor_date: '2023-08-17T03:51:53.048975+00:00'
     timezone: UTC
