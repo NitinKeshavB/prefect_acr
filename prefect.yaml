@@ -7,10 +7,26 @@ name: prefect_acr
 prefect-version: 2.11.3
 
 # build section allows you to manage and build docker images
-build: null
+build:
+- prefect.projects.steps.run_shell_script:
+    id: get-commit-hash
+    script: git rev-parse --short HEAD
+    stream_output: false
+- prefect_docker.deployments.steps.build_docker_image:
+    requires: prefect-docker>=0.3.1
+    id: build-image
+    dockerfile: auto
+    image_name: "{{ prefect.variables.image_name_mono }}"
+    tag: "{{ get-commit-hash.stdout }}"
 
 # push section allows you to manage if and how this project is uploaded to remote locations
-push: null
+push:
+- prefect_docker.deployments.steps.push_docker_image:
+    requires: prefect-docker>=0.3.1
+    image_name: '{{ build-image.image_name }}'
+    tag: '{{ build-image.tag }}'
+    credentials: '{{ prefect_docker.docker-registry-credentials.docker_registry_creds_name
+      }}'
 
 # pull section allows you to provide instructions for cloning this project in remote locations
 pull:
@@ -19,29 +35,33 @@ pull:
 
 
 definitions:
-
-  actions:
-        docker_build: &docker_build
-            - prefect.projects.steps.run_shell_script:
-                id: get-commit-hash
-                script: git rev-parse --short HEAD
-                stream_output: false
-            - prefect_docker.deployments.steps.build_docker_image: &docker_build_config
-                id: build-image-l
-                requires: prefect-docker>=0.3.1
-                image_name: jllsbxprefect.azurecr.io/jllsbxprefect/prefect_monorepo
-                tag: "{{ get-commit-hash.stdout }}"
-                dockerfile: auto
-                push: 
-                - prefect_docker.deployments.steps.push_docker_image:
-                    requires: prefect-docker>=0.3.1
-                    image_name: '{{ build-image-l.image_name }}'
-                    tag: '{{ build-image-l.tag }}'
-                    credentials: '{{ prefect_docker.docker-registry-credentials.docker_registry_creds_name }}'
-
+  tags: &common_tags
+    - "remote"
+    - "eks"
+    - "{{ get-commit-hash.stdout }}"
+  work_pool: &common_work_pool
+    name: "kubernetes"
+    job_variables:
+      image: "{{ build-image.image_name }}"
 
 # the deployments section allows you to provide configuration for deploying flows
 deployments:
+
+- name: "arthur"
+  tags: *common_tags
+  entrypoint: "flows/hello.py:hello"
+  parameters:
+    name: "Arthur"
+  work_pool: *common_work_pool
+
+- name: "databricks_execute"
+  tags: *common_tags
+  entrypoint: "flows/databricks_api_exec.py:databricks_job_submit"
+  parameters:
+    databricks_credentials_block_name: "qa-databricks-repo"
+    job_id: "157107892089699"
+  work_pool: *common_work_pool
+
 - name: databricks_exec
   version: null
   tags: []
@@ -50,15 +70,9 @@ deployments:
   parameters:
     databricks_credentials_block_name: "qa-databricks-repo"
     job_id: "157107892089699"
-  work_pool:
-    name: kubernetes
-    work_queue_name: null
-    job_variables:
-      image: '{{ build-image.image }}'
+  work_pool: *common_work_pool
   schedule:
     interval: 600
     anchor_date: '2023-08-17T03:51:53.048975+00:00'
     timezone: UTC
-  build: *docker_build
-
 

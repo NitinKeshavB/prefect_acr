@@ -1,0 +1,50 @@
+###
+### A complete description of a Prefect Deployment for flow 'databricks-job-submit'
+###
+name: databricks_exe
+description: null
+version: 00479ba25be10f7f9d4ba1b56bcbd3c0
+# The work queue that will handle this deployment's runs
+work_queue_name: default
+work_pool_name: kubernetes
+tags: []
+parameters: {}
+schedule: null
+is_schedule_active: null
+infra_overrides: {}
+infrastructure:
+  type: process
+  env: {}
+  labels: {}
+  name: null
+  command: null
+  stream_output: true
+  working_dir: null
+  block_type_slug: process
+  _block_type_slug: process
+
+###
+### DO NOT EDIT BELOW THIS LINE
+###
+flow_name: databricks-job-submit
+manifest_path: null
+storage: null
+path: C:\Users\nitin\prefect_acr
+entrypoint: flows\databricks_api_exec.py:databricks_job_submit
+parameter_openapi_schema:
+  title: Parameters
+  type: object
+  properties:
+    databricks_credentials_block_name:
+      title: databricks_credentials_block_name
+      position: 0
+      type: string
+    job_id:
+      title: job_id
+      position: 1
+  required:
+  - databricks_credentials_block_name
+  - job_id
+  definitions: null
+timestamp: '2023-08-17T08:02:11.928815+00:00'
+triggers: []
