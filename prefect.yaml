@@ -18,6 +18,7 @@ build:
     dockerfile: auto
     image_name: "{{ prefect.variables.image_name_mono }}"
     tag: "{{ get-commit-hash.stdout }}"
+    
 
 # push section allows you to manage if and how this project is uploaded to remote locations
 push:
@@ -25,8 +26,7 @@ push:
     requires: prefect-docker>=0.3.1
     image_name: '{{ build-image.image_name }}'
     tag: '{{ build-image.tag }}'
-    credentials: '{{ prefect_docker.docker-registry-credentials.docker_registry_creds_name
-      }}'
+    #credentials: '{{ prefect_docker.docker-registry-credentials.docker_registry_creds_name }}'
 
 # pull section allows you to provide instructions for cloning this project in remote locations
 pull:
