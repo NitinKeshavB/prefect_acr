@@ -3,7 +3,7 @@
 name: Deploy flows to env
 
 env:
-  PREFECT_API_KEY: "pnu_PxirMNgAXP5xsEIXNqEziqQpJikcJ81CyfHe"
+  #PREFECT_API_KEY: "pnu_PxirMNgAXP5xsEIXNqEziqQpJikcJ81CyfHe"
   #PREFECT_API_URL: "https://app.prefect.cloud/account/60a02238-cfc1-4e3d-9784-53f5ea65191b/workspace/20d43868-3e22-440c-9bb2-dc9e1b51126f"
   DEV_WORKSPACE: "nitinkeshavboutlookcom/dev"
 
