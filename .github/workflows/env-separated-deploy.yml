@@ -21,8 +21,8 @@ on:
         # The data type of the input
         type: string
 
-permissions:
-  contents: read
+#permissions:
+#  contents: read
 
 jobs:
   deploy_flows:
@@ -65,5 +65,5 @@ jobs:
          ls -ltr
          docker --version
          prefect version
-         prefect blocks ls
+         prefect cloud workspaces ls
          prefect deploy --all --ci
