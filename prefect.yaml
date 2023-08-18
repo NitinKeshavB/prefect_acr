@@ -1,36 +1,38 @@
-# Welcome to your prefect.yaml file! You can you this file for storing and managing
-# configuration for deploying your flows. We recommend committing this file to source
-# control along with your flow code.
+# File for configuring project / deployment build, push and pull steps
 
 # Generic metadata about this project
-name: prefect_acr
+name: kubernetes-worker-demo
 prefect-version: 2.11.3
 
 # build section allows you to manage and build docker images
+# TODO: Uses unreleased changes that requires installing from main:
+#     pip install git+https://github.com/PrefectHQ/prefect.git
+#     pip install git+https://github.com/PrefectHQ/prefect-docker.git
 build:
 - prefect.projects.steps.run_shell_script:
     id: get-commit-hash
     script: git rev-parse --short HEAD
     stream_output: false
-- prefect_docker.deployments.steps.build_docker_image:
-    requires: prefect-docker>=0.3.1
-    id: build-image
+- prefect_docker.projects.steps.build_docker_image:
+    requires: prefect-docker
+    image_name: "{{ prefect.variables.image_name }}"
+    tag: "latest"
     dockerfile: auto
-    image_name: "{{ prefect.variables.image_name_mono }}"
-    tag: "{{ get-commit-hash.stdout }}"
-    
+    push: true
+    platform: "linux/amd64"
+
 
 # push section allows you to manage if and how this project is uploaded to remote locations
-push:
-- prefect_docker.deployments.steps.push_docker_image:
-    requires: prefect-docker>=0.3.1
-    image_name: '{{ build-image.image_name }}'
-    tag: '{{ build-image.tag }}'
-    #credentials: '{{ prefect_docker.docker-registry-credentials.docker_registry_creds_name }}'
+push: null
 
 # pull section allows you to provide instructions for cloning this project in remote locations
 pull:
-- prefect.deployments.steps.set_working_directory:
+# - prefect.projects.steps.git_clone_project:
+#     repository: https://dev.azure.com/nitinkeshavb/_git/prefect_kubeworker
+#     branch: master
+#     access_token: t2vvy2mqkftg5ijn43sr37whjddsupdpucezhbukqtaqp7gungka
+
+- prefect.projects.steps.set_working_directory:
     directory: /opt/prefect/prefect_acr
 
 
@@ -42,9 +44,10 @@ definitions:
   work_pool: &common_work_pool
     name: "kubernetes"
     job_variables:
-      image: "{{ build-image.image_name }}"
+      image: "{{ image_name }}"
 
-# the deployments section allows you to provide configuration for deploying flows
+
+
 deployments:
 
 - name: "arthur"
@@ -61,18 +64,4 @@ deployments:
     databricks_credentials_block_name: "qa-databricks-repo"
     job_id: "157107892089699"
   work_pool: *common_work_pool
-
-- name: databricks_exec
-  version: null
-  tags: []
-  description: null
-  entrypoint: ./flows/databricks_api_exec.py:databricks_job_submit
-  parameters:
-    databricks_credentials_block_name: "qa-databricks-repo"
-    job_id: "157107892089699"
-  work_pool: *common_work_pool
-  schedule:
-    interval: 600
-    anchor_date: '2023-08-17T03:51:53.048975+00:00'
-    timezone: UTC
-
+  

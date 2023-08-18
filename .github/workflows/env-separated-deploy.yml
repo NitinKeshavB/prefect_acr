@@ -45,8 +45,16 @@ jobs:
           prefect-api-key: ${{ secrets.PREFECT_API_KEY }}
           prefect-workspace: "nitinkeshavboutlookcom/dev"
 
+      - name: Login to ACR
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.ACR_REGISTRY }}
+          username: ${{ secrets.ACR_USER }}
+          password: ${{ secrets.ACR_PASS }}
+
+      #az acr login -n ${{ secrets.ACR_REGISTRY }} -u ${{ secrets.ACR_USER }} -p ${{ secrets.ACR_PASS }}
+
       - name: deploy
         run: |        
-         az acr login -n ${{ secrets.ACR_REGISTRY }} -u ${{ secrets.ACR_USER }} -p ${{ secrets.ACR_PASS }}
          prefect version
          prefect deploy --all --ci
