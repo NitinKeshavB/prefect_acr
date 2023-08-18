@@ -2,11 +2,6 @@
 
 name: Deploy flows to env
 
-env:
-  #PREFECT_API_KEY: "pnu_PxirMNgAXP5xsEIXNqEziqQpJikcJ81CyfHe"
-  #PREFECT_API_URL: "https://app.prefect.cloud/account/60a02238-cfc1-4e3d-9784-53f5ea65191b/workspace/20d43868-3e22-440c-9bb2-dc9e1b51126f"
-  DEV_WORKSPACE: "nitinkeshavboutlookcom/dev"
-
 on:
   workflow_dispatch:
     # Inputs the workflow accepts.
@@ -21,8 +16,6 @@ on:
         # The data type of the input
         type: string
 
-#permissions:
-#  contents: read
 
 jobs:
   deploy_flows:
@@ -46,27 +39,14 @@ jobs:
           pip install --upgrade --upgrade-strategy eager -r requirements.txt
           
 
-      - name: Get list of modified python files
-        id: getfile
-        run: |
-          files=$(git diff --name-only | grep '^src/.*\.py$' | tr '\n' ',')
-          echo "Modified Python files: $files"
-          echo "files=$files" >> $GITHUB_ENV
-
-      #- name: Prefect Auth
-        #run: | 
-        #  prefect cloud login -k pnu_PxirMNgAXP5xsEIXNqEziqQpJikcJ81CyfHe -w "nitinkeshavboutlookcom/dev"
-        #uses: PrefectHQ/actions-prefect-auth@v1
-        #with:
-        #  prefect-api-key: "pnu_PxirMNgAXP5xsEIXNqEziqQpJikcJ81CyfHe"
-        #  prefect-workspace: "nitinkeshavboutlookcom/dev"
+      - name: Prefect Auth
+        uses: PrefectHQ/actions-prefect-auth@v1
+        with:
+          prefect-api-key: ${{ secrets.PREFECT_API_KEY }}
+          prefect-workspace: "nitinkeshavboutlookcom/dev"
 
       - name: deploy
         run: |        
-         az acr login -n jllsbxprefect.azurecr.io -u jllsbxprefect -p NCBY3GvxjE8x8lZW+ox9wvCdXo4JIBpekcqnwq6LEl+ACRBONePf
-         ls -ltr
-         docker --version
-         prefect cloud login -k pnu_PxirMNgAXP5xsEIXNqEziqQpJikcJ81CyfHe -w "nitinkeshavboutlookcom/dev"
+         az acr login -n ${{ secrets.ACR_REGISTRY }} -u ${{ secrets.ACR_USER }} -p ${{ secrets.ACR_PASS }}
          prefect version
-         prefect cloud workspaces ls
          prefect deploy --all --ci
