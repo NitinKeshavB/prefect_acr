@@ -53,17 +53,20 @@ jobs:
           echo "Modified Python files: $files"
           echo "files=$files" >> $GITHUB_ENV
 
-      - name: Prefect Auth
-        uses: PrefectHQ/actions-prefect-auth@v1
-        with:
-          prefect-api-key: "pnu_PxirMNgAXP5xsEIXNqEziqQpJikcJ81CyfHe"
-          prefect-workspace: "nitinkeshavboutlookcom/dev"
+      #- name: Prefect Auth
+        #run: | 
+        #  prefect cloud login -k pnu_PxirMNgAXP5xsEIXNqEziqQpJikcJ81CyfHe -w "nitinkeshavboutlookcom/dev"
+        #uses: PrefectHQ/actions-prefect-auth@v1
+        #with:
+        #  prefect-api-key: "pnu_PxirMNgAXP5xsEIXNqEziqQpJikcJ81CyfHe"
+        #  prefect-workspace: "nitinkeshavboutlookcom/dev"
 
       - name: deploy
         run: |        
          az acr login -n jllsbxprefect.azurecr.io -u jllsbxprefect -p NCBY3GvxjE8x8lZW+ox9wvCdXo4JIBpekcqnwq6LEl+ACRBONePf
          ls -ltr
          docker --version
+         prefect cloud login -k pnu_PxirMNgAXP5xsEIXNqEziqQpJikcJ81CyfHe -w "nitinkeshavboutlookcom/dev"
          prefect version
          prefect cloud workspaces ls
          prefect deploy --all --ci
