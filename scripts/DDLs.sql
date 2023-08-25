@@ -1,7 +1,8 @@
 CREATE TABLE prefect.flow (
 	flow_id SERIAL PRIMARY KEY,
-	flow_nm varchar(255) NULL,
-	proj_cd varchar(100) NULL,
+	flow_nm varchar(255) NOT NULL,
+	flow_type varchar(100) NOT NULL,
+	proj_cd varchar(100)NOT NULL,
 	Proj_cd_desc varchar(255) NULL,
 	layer varchar(100) NULL,
 	is_active varchar(10) NULL,

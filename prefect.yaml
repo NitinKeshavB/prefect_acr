@@ -47,21 +47,44 @@ definitions:
       image: "{{ image_name }}"
 
 
-
 deployments:
 
-- name: "arthur"
-  tags: *common_tags
-  entrypoint: "flows/hello.py:hello"
-  parameters:
-    name: "Arthur"
-  work_pool: *common_work_pool
-
-- name: "databricks_execute"
-  tags: *common_tags
-  entrypoint: "flows/databricks_api_exec.py:databricks_job_submit"
+- name: "gpa_landing_capf"
+  tags: Null
+  entrypoint: "flows/async_databricks_api_exec.py:databricks_job_submit"
   parameters:
     databricks_credentials_block_name: "qa-databricks-repo"
     job_id: "157107892089699"
   work_pool: *common_work_pool
-  
+
+- name: "gpa_landing_hff"
+  tags: 
+    - "depends_on:databricks-job-submit/gpa_landing_capf"
+    - "group:gpa"
+  entrypoint: "flows/async_databricks_api_exec.py:databricks_job_submit"
+  parameters:
+    databricks_credentials_block_name: "qa-databricks-repo"
+    job_id: "324922768946285"
+  work_pool: *common_work_pool
+
+
+- name: "gpa_landing_datman"
+  tags: 
+    - "depends_on:databricks-job-submit/gpa_landing_capf"
+    - "group:gpa"
+  entrypoint: "flows/async_databricks_api_exec.py:databricks_job_submit"
+  parameters:
+    databricks_credentials_block_name: "qa-databricks-repo"
+    job_id: "94525445717850"
+  work_pool: *common_work_pool
+
+
+- name: "gpa_landing_pix"
+  tags: 
+    - "depends_on:databricks-job-submit/gpa_landing_datman"
+    - "group:gpa"
+  entrypoint: "flows/async_databricks_api_exec.py:databricks_job_submit"
+  parameters:
+    databricks_credentials_block_name: "qa-databricks-repo"
+    job_id: "324922768946285"
+  work_pool: *common_work_pool
