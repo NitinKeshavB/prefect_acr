@@ -8,6 +8,24 @@ from prefect.logging import get_run_logger
 from prefect.server.schemas.filters import DeploymentFilterTags, DeploymentFilter
 
 
+
+def db_fetchone_job_submit(db_credentials_block_name: str, sql_query):
+    with SqlAlchemyConnector.load(db_credentials_block_name) as database:
+        _run_result = database.fetch_one(sql_query)
+        database.reset_connections()
+    return _run_result
+
+def db_fetchmany_job_submit(db_credentials_block_name: str, sql_query):
+    all_rows = []
+    with SqlAlchemyConnector.load(db_credentials_block_name) as database:
+        while True:
+            new_rows = database.fetch_many(sql_query, size = 2)
+            if len(new_rows) == 0:
+                break
+            all_rows.append(new_rows)
+    return all_rows
+
+
 async def _get_deployments_with_dependencies(filter_tags: DeploymentFilterTags) -> Dict[str, List[str]]:
     """
     Get deployments that match the filter and build a dictionary of {deployment -> list of upstream deployments}
@@ -72,8 +90,8 @@ async def run_orchestrator_flow(filter_tags: DeploymentFilterTags) -> None:
 
     for deployment_name in nx.topological_sort(graph):
         upstream_deployment_names = list(graph.predecessors(deployment_name))
-        upstream_deployment_futures = [futures[t] for t in upstream_deployment_names]
-        get_run_logger().info(f"Submitting task {deployment_name}")
+        upstream_deployment_futures = [futures[t] for t in upstream_deployment_names  if t.replace(" ","") ]
+        print(f"Submitting task {deployment_name} that waits for {upstream_deployment_futures}")
 
         @task(name=deployment_name)
         async def worker_task(name: str):
@@ -87,7 +105,7 @@ async def run_orchestrator_flow(filter_tags: DeploymentFilterTags) -> None:
 
 @flow(name="orchestration-test-flow")
 async def example_flow():
-    await run_orchestrator_flow(DeploymentFilterTags(all_=["group:ml"]))
+    await run_orchestrator_flow(DeploymentFilterTags(all_=["group:gpa"]))
 
 if __name__ == "__main__":
     asyncio.run(example_flow())

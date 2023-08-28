@@ -2,3 +2,5 @@ prefect>=2.11.3
 prefect-docker>=0.2.2
 prefect-kubernetes>=0.2.6
 prefect-databricks
+prefect_sqlalchemy
+psycopg2-binary

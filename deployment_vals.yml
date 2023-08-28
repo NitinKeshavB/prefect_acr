@@ -1,0 +1,99 @@
+- name: "gpa_landing_gll"
+  tags: 
+    - "group:gpa"
+  entrypoint: "flows/async_postgres_sql_exec.py:db_job_submit"
+  parameters:
+    db_credentials_block_name: "async-metadata-db-pgsql"
+    sql_query: "select public.get_common_actor_name()"
+  work_pool: *common_work_pool
+
+- name: "gpa_landing_capf"
+  tags: 
+    - "group:gpa"
+  entrypoint: "flows/async_databricks_api_exec.py:databricks_job_submit"
+  parameters:
+    databricks_credentials_block_name: "qa-databricks-repo"
+    job_id: "157107892089699"
+  work_pool: *common_work_pool
+
+- name: "gpa_landing_hff"
+  tags: 
+    - "depends_on:databricks-job-submit/gpa_landing_capf"
+    - "group:gpa"
+  entrypoint: "flows/async_databricks_api_exec.py:databricks_job_submit"
+  parameters:
+    databricks_credentials_block_name: "qa-databricks-repo"
+    job_id: "324922768946285"
+  work_pool: *common_work_pool
+
+
+- name: "gpa_landing_datman"
+  tags: 
+    - "depends_on:databricks-job-submit/gpa_landing_capf"
+    - "group:gpa"
+    - "depends_on:db-job-submit/gpa_landing_gll"
+  entrypoint: "flows/async_databricks_api_exec.py:databricks_job_submit"
+  parameters:
+    databricks_credentials_block_name: "qa-databricks-repo"
+    job_id: "94525445717850"
+  work_pool: *common_work_pool
+
+
+- name: "gpa_landing_pix"
+  tags: 
+    - "depends_on:databricks-job-submit/gpa_landing_datman"
+    - "group:gpa"
+  entrypoint: "flows/async_databricks_api_exec.py:databricks_job_submit"
+  parameters:
+    databricks_credentials_block_name: "qa-databricks-repo"
+    job_id: "324922768946285"
+  work_pool: *common_work_pool
+
+
+
+- name: "gpa_landing_get_api"
+  tags: 
+    - "depends_on:databricks-job-submit/gpa_landing_datman"
+    - "group:gpa"
+  entrypoint: "flows/async_rest_api_exec.py:get_api_job_submit"
+  parameters:
+    endpoint: "https://api.prefect.cloud/api/accounts/60a02238-cfc1-4e3d-9784-53f5ea65191b/workspaces/20d43868-3e22-440c-9bb2-dc9e1b51126f/health"
+    headers: '{"Authorization": "Bearer pnu_PxirMNgAXP5xsEIXNqEziqQpJikcJ81CyfHe", "Content-Type": "application/json"}'
+    params: ''
+  work_pool: *common_work_pool
+
+
+- name: "gpa_landing_post_api"
+  tags: 
+    - "depends_on:get-api-job-submit/gpa_landing_get_api"
+    - "group:gpa"
+  entrypoint: "flows/async_rest_api_exec.py:post_api_job_submit"
+  parameters:
+    endpoint: "https://api.prefect.cloud/api/accounts/60a02238-cfc1-4e3d-9784-53f5ea65191b/workspaces/20d43868-3e22-440c-9bb2-dc9e1b51126f/deployments/filter"
+    headers:  '{"Authorization": "Bearer pnu_PxirMNgAXP5xsEIXNqEziqQpJikcJ81CyfHe", "Content-Type": "application/json"}'
+    payload:  '{"sort": "CREATED_DESC","offset": 0}'
+  work_pool: *common_work_pool
+
+
+- name: "gpa_landing_get_az_api"
+  tags: 
+    - "depends_on:post-api-job-submit/gpa_landing_post_api"
+    - "group:gpa"
+  entrypoint: "flows/async_rest_api_exec.py:get_api_job_submit"
+  parameters:
+    endpoint: "https://get-temp-prefect.azurewebsites.net/api/CityTemperature"
+    headers: '{ "Content-Type": "application/json"}'
+    params: '{"name":"chicago"}'
+  work_pool: *common_work_pool
+
+
+- name: "gpa_landing_get_az2_api"
+  tags: 
+    - "depends_on:get-api-job-submit/gpa_landing_get_az_api"
+    - "group:gpa"
+  entrypoint: "flows/async_rest_api_exec.py:get_api_job_submit"
+  parameters:
+    endpoint: "https://get-temp-prefect.azurewebsites.net/api/CityTemperature"
+    headers: '{ "Content-Type": "application/json"}'
+    params: '{"name":"chicago"}'
+  work_pool: *common_work_pool
