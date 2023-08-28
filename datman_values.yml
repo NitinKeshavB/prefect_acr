@@ -1,0 +1,77 @@
+- name: "datman_landing_entity_1"
+  tags: 
+    - "group:datman"
+  entrypoint: "flows/async_databricks_api_exec.py:databricks_job_submit"
+  parameters:
+    databricks_credentials_block_name: "qa-databricks-repo"
+    job_id: "157107892089699"
+  work_pool: *common_work_pool
+
+
+- name: "datman_landing_entity_2"
+  tags: 
+    - "group:datman"
+  entrypoint: "flows/async_postgres_sql_exec.py:db_job_submit"
+  parameters:
+    db_credentials_block_name: "async-metadata-db-pgsql"
+    sql_query: "select public.get_common_actor_name()"
+  work_pool: *common_work_pool
+
+
+- name: "datman_landing_entity_3"
+  tags: 
+    - "group:datman"
+    - "depends_on:db-job-submit/datman_landing_entity_2"
+  entrypoint: "flows/async_databricks_api_exec.py:databricks_job_submit"
+  parameters:
+    databricks_credentials_block_name: "qa-databricks-repo"
+    job_id: "324922768946285"
+  work_pool: *common_work_pool
+
+
+- name: "datman_landing_entity_4"
+  tags: 
+    - "group:datman"
+    - "depends_on:db-job-submit/datman_landing_entity_2"
+    - "depends_on:databricks-job-submit/datman_landing_entity_1"
+  entrypoint: "flows/async_postgres_sql_exec.py:db_job_submit"
+  parameters:
+    db_credentials_block_name: "async-metadata-db-pgsql"
+    sql_query: "select public.get_film_count()"
+  work_pool: *common_work_pool
+
+
+- name: "datman_landing_entity_5"
+  tags: 
+    - "group:datman"
+    - "depends_on:databricks-job-submit/datman_landing_entity_1"
+  entrypoint: "flows/async_databricks_api_exec.py:databricks_job_submit"
+  parameters:
+    databricks_credentials_block_name: "qa-databricks-repo"
+    job_id: "94525445717850"
+  work_pool: *common_work_pool
+
+
+- name: "datman_landing_entity_6"
+  tags: 
+    - "group:datman"
+    - "depends_on:databricks-job-submit/datman_landing_entity_5"
+  entrypoint: "flows/async_databricks_api_exec.py:databricks_job_submit"
+  parameters:
+    databricks_credentials_block_name: "qa-databricks-repo"
+    job_id: "157107892089699"
+  work_pool: *common_work_pool
+
+
+
+- name: "datman_landing_entity_7"
+  tags: 
+    - "group:datman"
+    - "depends_on:db-job-submit/datman_landing_entity_4"
+    - "depends_on:databricks-job-submit/datman_landing_entity_3"
+  entrypoint: "flows/async_postgres_sql_exec.py:db_job_submit"
+  parameters:
+    db_credentials_block_name: "async-metadata-db-pgsql"
+    sql_query: "select public.get_common_actor_name()"
+  work_pool: *common_work_pool
+
