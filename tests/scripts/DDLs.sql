@@ -114,7 +114,7 @@ values (3, 'deployment','gpa_landing_entity_3','flow workpool', current_timestam
 	   (3, 'parameters:databricks_credentials_block_name','qa-databricks-repo','flow parameters', current_timestamp, current_timestamp),
 	   (3, 'parameters:job_id','324922768946285','flow parameters', current_timestamp, current_timestamp),
 	   (3, 'tags:1','group:gpa','flow tags', current_timestamp, current_timestamp),
-	   (3, 'tags:2','depends_on:databricks-job-submit/gpa_landing_entity_2','flow tags', current_timestamp, current_timestamp),
+	   (3, 'tags:2','depends_on:db-job-submit/gpa_landing_entity_2','flow tags', current_timestamp, current_timestamp),
 	   (3, 'work_pool','*common_work_pool','flow workpool', current_timestamp, current_timestamp),
 	   (3, 'keyvault','gpa_landing_entity_3','flow az keyvault', current_timestamp, current_timestamp);
 	   
@@ -249,3 +249,85 @@ insert into prefect.flow_depends values ('gpa','landing',12,'gpa_landing_entity_
 
 
 
+
+CREATE OR REPLACE FUNCTION prefect.gen_flow_run_id(_prj_nm text DEFAULT NULL::text)
+ RETURNS character varying
+ LANGUAGE plpgsql
+AS $function$
+declare
+
+   _run_id bigint;
+   _all_flw_cnt int;
+   _failed_cnt int;
+   _all_cnt int;
+   _fn_status varchar(255);
+   _rslt text; 
+   _json_rtrn_cd text;  
+   _json_rtrn_msg text;
+   _curr_ts timestamp; 
+
+
+  
+begin
+	
+	  SET SESSION timezone TO 'Australia/Sydney';  
+	  _json_rtrn_cd := '{key:rtrn_cd, value:false}';
+      _json_rtrn_msg := '{key:rtrn_msg, value:}';
+
+     
+     
+	  IF $1 is null THEN
+	  _json_rtrn_cd := '{key:rtrn_cd, value:true}';
+	  _json_rtrn_msg := '{key:rtrn_msg, value: pass prj_nm as input parameter}';  
+	  _rslt := '['||_json_rtrn_cd||','||_json_rtrn_msg||']'; 
+	  RETURN _rslt;
+	  END IF;
+    
+    
+
+    
+	  --Get maxId 
+	  SELECT COALESCE(max(RUN_ID),0) AS run_id into _run_id FROM prefect.flow_run_status WHERE proj_cd = _prj_nm;   
+   
+      SELECT COUNT(*) into _all_flw_cnt from prefect.flow where proj_cd = _prj_nm and is_active = 'Y';
+   
+	  if _all_flw_cnt = 0 then
+		 _json_rtrn_cd := '{key:rtrn_cd, value:true}';
+	  	_json_rtrn_msg := '{key:rtrn_msg, value: No flows registered for project}';  
+	  	_rslt := '['||_json_rtrn_cd||','||_json_rtrn_msg||']'; 
+	  	RETURN _rslt;
+	 end if;
+   
+   
+	  SELECT COUNT(distinct flow_nm) into _failed_cnt from prefect.flow_run_status  where RUN_ID = _run_id and proj_cd = _prj_nm AND UPPER(flow_status) != 'COMPLETED' ;   
+   
+      SELECT COUNT(distinct flow_nm) into _all_cnt from prefect.flow_run_status  where RUN_ID = _run_id and proj_cd = _prj_nm AND UPPER(flow_status) = 'COMPLETED' ;
+   
+   
+	  IF ( _all_cnt = _all_flw_cnt and _failed_cnt = 0) or (_run_id = 0)  then
+	  
+	  	SELECT  json_agg(row_to_json(dt_2)) into _rslt 
+	  			FROM   (
+	  					SELECT concat('NEW:RUN_ID:',cast((_run_id + 1) as VARCHAR) ) as status 
+	  				)dt_2;
+	  ELSE
+	
+ 		SELECT  json_agg(row_to_json(dt_2)) into _rslt
+				FROM   (
+							SELECT concat('FAILED:RUN_ID:',cast(_run_id as VARCHAR)) as status 
+						)dt_2;
+   
+   	end if;
+   
+    RETURN _rslt;
+
+  -- catch any errors and return a false instead of sql failure
+  exception
+  when others then
+    _json_rtrn_cd := '{key:rtrn_cd, value:true}';
+    _json_rtrn_msg := '{key:rtrn_msg, value:Code error - ' || SQLERRM || '}';
+    _rslt := '[' || _json_rtrn_cd || ',' || _json_rtrn_msg ||']'; 
+    RETURN _rslt;
+
+END; $function$
+;
