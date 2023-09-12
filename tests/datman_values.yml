@@ -1,8 +1,60 @@
+# File for configuring project / deployment build, push and pull steps
+
+# Generic metadata about this project
+name: kubernetes-worker-demo
+prefect-version: 2.11.3
+
+# build section allows you to manage and build docker images
+# TODO: Uses unreleased changes that requires installing from main:
+#     pip install git+https://github.com/PrefectHQ/prefect.git
+#     pip install git+https://github.com/PrefectHQ/prefect-docker.git
+build:
+- prefect.projects.steps.run_shell_script:
+    id: get-commit-hash
+    script: git rev-parse --short HEAD
+    stream_output: false
+- prefect_docker.projects.steps.build_docker_image:
+    requires: prefect-docker
+    image_name: "{{ prefect.variables.image_name }}"
+    tag: "latest"
+    dockerfile: auto
+    push: true
+    platform: "linux/amd64"
+
+
+# push section allows you to manage if and how this project is uploaded to remote locations
+push: null
+
+# pull section allows you to provide instructions for cloning this project in remote locations
+pull:
+# - prefect.projects.steps.git_clone_project:
+#     repository: https://dev.azure.com/nitinkeshavb/_git/prefect_kubeworker
+#     branch: master
+#     access_token: t2vvy2mqkftg5ijn43sr37whjddsupdpucezhbukqtaqp7gungka
+
+- prefect.projects.steps.set_working_directory:
+    directory: /opt/prefect/prefect_acr
+
+
+definitions:
+  tags: &common_tags
+    - "remote"
+    - "eks"
+    - "{{ get-commit-hash.stdout }}"
+  work_pool: &common_work_pool
+    name: "kubernetes"
+    job_variables:
+      image: "{{ image_name }}"
+
+
+deployments:
+
 - name: "datman_landing_entity_1"
   tags: 
     - "group:datman"
   entrypoint: "flows/async_databricks_api_exec.py:databricks_job_submit"
   parameters:
+    exec_name: "datman_landing_entity_1"
     databricks_credentials_block_name: "qa-databricks-repo"
     job_id: "157107892089699"
   work_pool: *common_work_pool
@@ -13,6 +65,7 @@
     - "group:datman"
   entrypoint: "flows/async_postgres_sql_exec.py:db_job_submit"
   parameters:
+    exec_name: "datman_landing_entity_2"
     db_credentials_block_name: "async-metadata-db-pgsql"
     sql_query: "select public.get_common_actor_name()"
   work_pool: *common_work_pool
@@ -24,6 +77,7 @@
     - "depends_on:db-job-submit/datman_landing_entity_2"
   entrypoint: "flows/async_databricks_api_exec.py:databricks_job_submit"
   parameters:
+    exec_name: "datman_landing_entity_3"
     databricks_credentials_block_name: "qa-databricks-repo"
     job_id: "324922768946285"
   work_pool: *common_work_pool
@@ -36,6 +90,7 @@
     - "depends_on:databricks-job-submit/datman_landing_entity_1"
   entrypoint: "flows/async_postgres_sql_exec.py:db_job_submit"
   parameters:
+    exec_name: "datman_landing_entity_4"
     db_credentials_block_name: "async-metadata-db-pgsql"
     sql_query: "select public.get_film_count()"
   work_pool: *common_work_pool
@@ -47,6 +102,7 @@
     - "depends_on:databricks-job-submit/datman_landing_entity_1"
   entrypoint: "flows/async_databricks_api_exec.py:databricks_job_submit"
   parameters:
+    exec_name: "datman_landing_entity_5"
     databricks_credentials_block_name: "qa-databricks-repo"
     job_id: "94525445717850"
   work_pool: *common_work_pool
@@ -58,6 +114,7 @@
     - "depends_on:databricks-job-submit/datman_landing_entity_5"
   entrypoint: "flows/async_databricks_api_exec.py:databricks_job_submit"
   parameters:
+    exec_name: "datman_landing_entity_6"
     databricks_credentials_block_name: "qa-databricks-repo"
     job_id: "157107892089699"
   work_pool: *common_work_pool
@@ -71,7 +128,72 @@
     - "depends_on:databricks-job-submit/datman_landing_entity_3"
   entrypoint: "flows/async_postgres_sql_exec.py:db_job_submit"
   parameters:
+    exec_name: "datman_landing_entity_7"
     db_credentials_block_name: "async-metadata-db-pgsql"
     sql_query: "select public.get_common_actor_name()"
   work_pool: *common_work_pool
 
+
+- name: "datman_landing_entity_8"
+  tags: 
+    - "depends_on:databricks-job-submit/datman_landing_entity_3"
+    - "group:datman"
+  entrypoint: "flows/async_rest_api_exec.py:get_api_job_submit"
+  parameters:
+    exec_name: "datman_landing_entity_8"
+    endpoint: "https://api.prefect.cloud/api/accounts/60a02238-cfc1-4e3d-9784-53f5ea65191b/workspaces/20d43868-3e22-440c-9bb2-dc9e1b51126f/health"
+    headers: '{"Authorization": "Bearer pnu_PxirMNgAXP5xsEIXNqEziqQpJikcJ81CyfHe", "Content-Type": "application/json"}'
+    params: ''
+  work_pool: *common_work_pool
+
+
+- name: "datman_landing_entity_9"
+  tags: 
+    - "depends_on:get-api-job-submit/datman_landing_entity_8"
+    - "group:datman"
+  entrypoint: "flows/async_rest_api_exec.py:post_api_job_submit"
+  parameters:
+    exec_name: "datman_landing_entity_9"
+    endpoint: "https://api.prefect.cloud/api/accounts/60a02238-cfc1-4e3d-9784-53f5ea65191b/workspaces/20d43868-3e22-440c-9bb2-dc9e1b51126f/deployments/filter"
+    headers:  '{"Authorization": "Bearer pnu_PxirMNgAXP5xsEIXNqEziqQpJikcJ81CyfHe", "Content-Type": "application/json"}'
+    payload:  '{"sort": "CREATED_DESC","offset": 0}'
+  work_pool: *common_work_pool
+
+
+- name: "datman_landing_entity_10"
+  tags: 
+    - "group:datman"
+    - "depends_on:db-job-submit/datman_landing_entity_7"
+  entrypoint: "flows/async_databricks_api_exec.py:databricks_job_submit"
+  parameters:
+    exec_name: "datman_landing_entity_10"
+    databricks_credentials_block_name: "qa-databricks-repo"
+    job_id: "157107892089699"
+  work_pool: *common_work_pool
+
+
+
+- name: "datman_landing_entity_11"
+  tags: 
+    - "depends_on:databricks-job-submit/datman_landing_entity_10"
+    - "group:datman"
+  entrypoint: "flows/async_rest_api_exec.py:get_api_job_submit"
+  parameters:
+    exec_name: "datman_landing_entity_11"
+    endpoint: "https://get-temp-prefect.azurewebsites.net/api/CityTemperature"
+    headers: '{ "Content-Type": "application/json"}'
+    params: '{"name":"chicago"}'
+  work_pool: *common_work_pool
+
+
+- name: "datman_landing_entity_12"
+  tags: 
+    - "depends_on:get-api-job-submit/datman_landing_entity_11"
+    - "group:datman"
+  entrypoint: "flows/async_rest_api_exec.py:get_api_job_submit"
+  parameters:
+    exec_name: "datman_landing_entity_12"
+    endpoint: "https://get-temp-prefect.azurewebsites.net/api/CityTemperature"
+    headers: '{ "Content-Type": "application/json"}'
+    params: '{"name":"bengaluru"}'
+  work_pool: *common_work_pool
