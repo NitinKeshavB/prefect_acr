@@ -10,6 +10,7 @@ from prefect.server.schemas.filters import DeploymentFilterTags, DeploymentFilte
 from prefect_sqlalchemy import SqlAlchemyConnector, ConnectionComponents, AsyncDriver
 from prefect.futures import PrefectFuture
 
+############################################ Func ############################################
 
 async def metadb_fetchone_job_submit(db_credentials_block_name: str, sql_query):
    async with await SqlAlchemyConnector.load(db_credentials_block_name) as database:
@@ -186,19 +187,19 @@ async def run_orchestrator_flow(filter_tags: DeploymentFilterTags) -> None:
             time.sleep(15)
             print("-------> Waiting for TASK Completion <-------------")
             print(f"Task state waiting for {futures[future_v]}")
-            print("-------> getting there!! hold tight <-------------")
+            print("-------> getting there!! hold tight <-------------\n")
             state = await futures[future_v].get_state()
             if str(state).lower() != 'pending()' and str(state).lower() != 'running()' :
                 break
     
-    print("-------> All TASKS have been Completed <-------------")
+    print("\n-------> All TASKS have been Completed <-------------\n")
     return futures[final_state]
 
 
 
 @flow(name="orchestration-gpa-flow")
 async def example_flow():
-
+    #wait for jobs to complete
     await run_orchestrator_flow(DeploymentFilterTags(all_=["group:gpa"]))
     
     run_details={}

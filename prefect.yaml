@@ -142,7 +142,7 @@ deployments:
   parameters:
     exec_name: "gpa_landing_entity_8"
     endpoint: "https://api.prefect.cloud/api/accounts/60a02238-cfc1-4e3d-9784-53f5ea65191b/workspaces/20d43868-3e22-440c-9bb2-dc9e1b51126f/health"
-    headers: '{"Authorization": "Bearer pnu_PxirMNgAXP5xsEIXNqEziqQpJikcJ81CyfHe", "Content-Type": "application/json"}'
+    headers: '{"Authorization": "Bearer pnu_YxKXMdmyfULHv8Fa1lyoPcLlbODq7O3JqBuI", "Content-Type": "application/json"}'
     params: ''
   work_pool: *common_work_pool
 
@@ -155,7 +155,7 @@ deployments:
   parameters:
     exec_name: "gpa_landing_entity_9"
     endpoint: "https://api.prefect.cloud/api/accounts/60a02238-cfc1-4e3d-9784-53f5ea65191b/workspaces/20d43868-3e22-440c-9bb2-dc9e1b51126f/deployments/filter"
-    headers:  '{"Authorization": "Bearer pnu_PxirMNgAXP5xsEIXNqEziqQpJikcJ81CyfHe", "Content-Type": "application/json"}'
+    headers:  '{"Authorization": "Bearer pnu_YxKXMdmyfULHv8Fa1lyoPcLlbODq7O3JqBuI", "Content-Type": "application/json"}'
     payload:  '{"sort": "CREATED_DESC","offset": 0}'
   work_pool: *common_work_pool
 
