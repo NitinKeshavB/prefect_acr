@@ -89,7 +89,7 @@ deployments:
   entrypoint: "flows/async_postgres_sql_exec.py:db_job_submit"
   parameters:
     db_credentials_block_name: "async-metadata-db-pgsql"
-    sql_query: "select public.get_film_count()"
+    sql_query: "select public.get_film_count() "
   work_pool: *common_work_pool
 
 
