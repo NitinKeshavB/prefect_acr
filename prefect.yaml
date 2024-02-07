@@ -197,7 +197,7 @@ deployments:
   entrypoint: "flows/async_rest_api_exec.py:get_api_job_submit"
   parameters:
     exec_name: "gpa_landing_entity_12"
-    endpoint: "https://get-temp-prefect.azurewebsites.net/api/CityTemperatur"
+    endpoint: "https://get-temp-prefect.azurewebsites.net/api/CityTemperature"
     headers: '{ "Content-Type": "application/json"}'
     params: '{"name":"bengaluru"}'
   work_pool: *common_work_pool
