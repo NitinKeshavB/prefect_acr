@@ -197,3 +197,9 @@ deployments:
     headers: '{ "Content-Type": "application/json"}'
     params: '{"name":"bengaluru"}'
   work_pool: *common_work_pool
+
+- name: "gpa_orchestrator"
+  tags: 
+    - "group:gpa"
+  entrypoint: "flows/async_gpa.py:example_flow"
+  work_pool: *common_work_pool

@@ -8,7 +8,7 @@ from prefect.deployments import run_deployment
 from prefect.logging import get_run_logger
 from prefect.server.schemas.filters import DeploymentFilterTags, DeploymentFilter
 from prefect_sqlalchemy import SqlAlchemyConnector, ConnectionComponents, AsyncDriver
-#from prefect.futures import PrefectFuture
+from prefect.futures import PrefectFuture
 
 ############################################ Func ############################################
 
@@ -219,5 +219,3 @@ async def example_flow():
 
 if __name__ == "__main__":
     asyncio.run(example_flow())
-
-    
