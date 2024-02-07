@@ -4,3 +4,4 @@ prefect-kubernetes>=0.2.6
 prefect-databricks
 prefect_sqlalchemy
 psycopg2-binary
+networkx

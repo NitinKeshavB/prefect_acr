@@ -49,6 +49,12 @@ definitions:
 
 deployments:
 
+- name: "gpa_orchestrator"
+  tags: 
+    - "group:gpa"
+  entrypoint: "flows/async_gpa.py:example_flow"
+  work_pool: *common_work_pool
+
 - name: "gpa_landing_entity_1"
   tags: 
     - "group:gpa"
@@ -196,10 +202,4 @@ deployments:
     endpoint: "https://get-temp-prefect.azurewebsites.net/api/CityTemperature"
     headers: '{ "Content-Type": "application/json"}'
     params: '{"name":"bengaluru"}'
-  work_pool: *common_work_pool
-
-- name: "gpa_orchestrator"
-  tags: 
-    - "group:gpa"
-  entrypoint: "flows/async_gpa.py:example_flow"
   work_pool: *common_work_pool
